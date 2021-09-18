@@ -29,6 +29,10 @@ func ParseCIDR(cidr string) (*TwoPointsRange, error) {
 	r.start = cloneIP(network.IP)
 	r.end = cloneIP(network.IP)
 
+	if len(r.start) > 4 {
+		return r, fmt.Errorf("Only IPv4 networks are supported")
+	}
+
 	ones, _ := network.Mask.Size()
 	firstSetByte := ones / 8
 
@@ -93,6 +97,10 @@ type MultipleRanges struct {
 	ranges []Range
 }
 
+func (r *MultipleRanges) Append(_r Range) {
+	r.ranges = append(r.ranges, _r)
+}
+
 func (r *MultipleRanges) CreateIterator() RangeIterator {
 	return &MultipleRangesIterator{
 		i:      -1,
@@ -119,7 +127,6 @@ func (iterator *MultipleRangesIterator) GetNext() net.IP {
 	}
 
 	iterator.i++
-	fmt.Println(iterator.i)
 	iterator.it = iterator.ranges[iterator.i].CreateIterator()
 	return iterator.it.GetNext()
 }

@@ -1,7 +1,6 @@
 package scanner
 
 import (
-	"fmt"
 	"net"
 	"testing"
 )
@@ -55,7 +54,6 @@ func TestMultipleRangeIterator(t *testing.T) {
 		t.Errorf("Failed to parse: %s", err)
 	}
 
-	fmt.Println(mr.ranges[1])
 	count := 1
 	it := mr.CreateIterator()
 	firstIP := it.GetNext()
