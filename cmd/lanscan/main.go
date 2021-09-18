@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/und3f/lanscan/discoverer"
 	"github.com/und3f/lanscan/scanner"
@@ -12,16 +13,19 @@ const SCAN_TIMES = 3
 
 func main() {
 	hosts := make(map[string]scanner.Host)
-	/*
+	var scanRange scanner.Range
+	var err error
 
-		scanRange, err := scanner.ParseCIDR(os.Args[1])
+	if len(os.Args) >= 2 {
+		scanRange, err = scanner.ParseCIDR(os.Args[1])
 		if err != nil {
 			log.Fatalf("Failed to parse scanning range: %s", err)
 		}
-	*/
-	scanRange, err := discoverer.Interfaces()
-	if err != nil {
-		log.Fatalf("Failed to discover scanning range: %s", err)
+	} else {
+		scanRange, err = discoverer.Interfaces()
+		if err != nil {
+			log.Fatalf("Failed to discover scanning range: %s", err)
+		}
 	}
 
 	networkScanner := scanner.NewPingScanner()
