@@ -1,7 +1,6 @@
 package discoverer
 
 import (
-	"fmt"
 	"log"
 	"net"
 
@@ -17,7 +16,6 @@ func Interfaces() (scanner.Range, error) {
 	mr := scanner.MultipleRanges{}
 
 	for _, interf := range interfaces {
-		fmt.Println(interf.Flags)
 		if interf.Flags&net.FlagUp == 0 || interf.Flags&net.FlagLoopback != 0 {
 			continue
 		}
@@ -27,7 +25,6 @@ func Interfaces() (scanner.Range, error) {
 			continue
 		}
 		for _, addr := range addrs {
-			fmt.Println(addr)
 			r, err := scanner.ParseCIDR(addr.String())
 			if err != nil {
 				log.Printf("Range parsing of address %s failed: %v\n", addr, err)
