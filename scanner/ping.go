@@ -15,6 +15,7 @@ type PingScanner struct {
 
 func NewPingScanner() *PingScanner {
 	ps := new(PingScanner)
+	ps.ScannerEvents.InitEmpty()
 
 	ps.fastPing = fastping.NewPinger()
 	ps.SetICMP(true)

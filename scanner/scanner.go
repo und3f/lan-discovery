@@ -9,6 +9,9 @@ type Host struct {
 	hostname string
 }
 
+type HostFoundHandler func(host Host)
+type ScanEndedHandler func()
+
 type Scanner interface {
 	Scan(Range) error
 	SetHostFoundHandler(handler HostFoundHandler)
@@ -28,5 +31,7 @@ func (se *ScannerEvents) SetScanEndedHandler(handler ScanEndedHandler) {
 	se.scanEndedHandler = handler
 }
 
-type HostFoundHandler func(host Host)
-type ScanEndedHandler func()
+func (se *ScannerEvents) InitEmpty() {
+	se.hostFoundHandler = func(host Host) {}
+	se.scanEndedHandler = func() {}
+}

@@ -17,7 +17,7 @@ func TestPingScanner(t *testing.T) {
 		t.Fatal("Failed to initialize ping scanner")
 	}
 
-	if err := scanner.Scan(&scanRange); err != nil {
+	if err := scanner.Scan(scanRange); err != nil {
 		t.Errorf("Failed to scan network: %s", err)
 	}
 

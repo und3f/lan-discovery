@@ -18,8 +18,7 @@ func main() {
 	networkScanner.SetHostFoundHandler(func(host scanner.Host) {
 		fmt.Println(host)
 	})
-	networkScanner.SetScanEndedHandler(func() {
-	})
+
 	if err := networkScanner.Scan(scanRange); err != nil {
 		log.Fatalf("Failed to start scanning: %s", err)
 	}
