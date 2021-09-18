@@ -11,7 +11,7 @@ type RangeIterator interface {
 }
 
 type Range interface {
-	createIterator() RangeIterator
+	CreateIterator() RangeIterator
 }
 
 type TwoPointsRange struct {
@@ -65,7 +65,7 @@ func cloneIP(ip net.IP) net.IP {
 	return cloned
 }
 
-func (r *TwoPointsRange) createIterator() RangeIterator {
+func (r *TwoPointsRange) CreateIterator() RangeIterator {
 	end := cloneIP(r.end)
 	incIP(end)
 	return &twoPointsRangeIterator{
@@ -87,4 +87,39 @@ func (iterator *twoPointsRangeIterator) GetNext() net.IP {
 	incIP(iterator.current)
 
 	return current
+}
+
+type MultipleRanges struct {
+	ranges []Range
+}
+
+func (r *MultipleRanges) CreateIterator() RangeIterator {
+	return &MultipleRangesIterator{
+		i:      -1,
+		ranges: r.ranges,
+	}
+}
+
+type MultipleRangesIterator struct {
+	i      int
+	it     RangeIterator
+	ranges []Range
+}
+
+func (r *MultipleRangesIterator) HasNext() bool {
+	if r.it == nil || r.it.HasNext() || r.i < len(r.ranges)-1 {
+		return true
+	}
+	return false
+}
+
+func (iterator *MultipleRangesIterator) GetNext() net.IP {
+	if iterator.it != nil && iterator.it.HasNext() {
+		return iterator.it.GetNext()
+	}
+
+	iterator.i++
+	fmt.Println(iterator.i)
+	iterator.it = iterator.ranges[iterator.i].CreateIterator()
+	return iterator.it.GetNext()
 }

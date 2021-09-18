@@ -1,6 +1,7 @@
 package scanner
 
 import (
+	"fmt"
 	"net"
 	"testing"
 )
@@ -23,7 +24,7 @@ func TestRangeIterator(t *testing.T) {
 		t.Errorf("Failed to parse: %s", err)
 	} else {
 		count := 1
-		it := r.createIterator()
+		it := r.CreateIterator()
 		firstIP := it.GetNext()
 		var lastIP net.IP
 		for it.HasNext() {
@@ -39,5 +40,37 @@ func TestRangeIterator(t *testing.T) {
 		if !lastIP.Equal(net.ParseIP("127.0.0.255")) {
 			t.Errorf("Wrong last address %s", lastIP)
 		}
+	}
+}
+
+func TestMultipleRangeIterator(t *testing.T) {
+	var err error
+	var mr MultipleRanges
+	mr.ranges = make([]Range, 2)
+	if mr.ranges[0], err = ParseCIDR("127.0.0.1/24"); err != nil {
+		t.Errorf("Failed to parse: %s", err)
+	}
+
+	if mr.ranges[1], err = ParseCIDR("127.0.3.3/24"); err != nil {
+		t.Errorf("Failed to parse: %s", err)
+	}
+
+	fmt.Println(mr.ranges[1])
+	count := 1
+	it := mr.CreateIterator()
+	firstIP := it.GetNext()
+	var lastIP net.IP
+	for it.HasNext() {
+		lastIP = it.GetNext()
+		count++
+	}
+	if count != 2*256 {
+		t.Errorf("Iterated %d times while expected 256", count)
+	}
+	if !firstIP.Equal(net.ParseIP("127.0.0.0")) {
+		t.Errorf("Wrong first address %s", firstIP)
+	}
+	if !lastIP.Equal(net.ParseIP("127.0.3.255")) {
+		t.Errorf("Wrong last address %s", lastIP)
 	}
 }

@@ -43,7 +43,7 @@ func (scanner *PingScanner) AddHost(ip *net.IPAddr) {
 }
 
 func (scanner *PingScanner) Scan(network Range) error {
-	for it := network.createIterator(); it.HasNext(); {
+	for it := network.CreateIterator(); it.HasNext(); {
 		var ipaddr net.IPAddr
 		ipaddr.IP = it.GetNext()
 
