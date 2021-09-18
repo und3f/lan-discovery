@@ -32,6 +32,9 @@ func ParseCIDR(cidr string) (*TwoPointsRange, error) {
 	if len(r.start) > 4 {
 		return r, fmt.Errorf("Only IPv4 networks are supported")
 	}
+	if r.start[0] == 172 {
+		return r, fmt.Errorf("Unicast addresses are forbidden")
+	}
 
 	ones, _ := network.Mask.Size()
 	firstSetByte := ones / 8

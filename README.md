@@ -1,3 +1,7 @@
-# lanscan
+# LAN Discovery
 
-LAN scanner tool inspired by Android App "Net Analyzer"
+Discover LAN-connected devices.
+
+## Usage
+
+sudo go run cmd/lanscan/main.go
