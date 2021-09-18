@@ -1,12 +1,17 @@
 package scanner
 
 import (
+	"fmt"
 	"net"
 )
 
 type Host struct {
-	ip       net.IP
-	hostname string
+	IP       net.IP
+	Hostname string
+}
+
+func (h *Host) String() string {
+	return fmt.Sprintf("%s", h.IP.String())
 }
 
 type HostFoundHandler func(host Host)

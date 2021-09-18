@@ -38,7 +38,7 @@ func (scanner *PingScanner) SetICMP(useICMP bool) {
 
 func (scanner *PingScanner) AddHost(ip *net.IPAddr) {
 	var host Host
-	host.ip = cloneIP(ip.IP)
+	host.IP = cloneIP(ip.IP)
 	scanner.hostFoundHandler(host)
 }
 

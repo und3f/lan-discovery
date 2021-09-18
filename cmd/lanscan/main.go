@@ -16,9 +16,10 @@ func main() {
 	networkScanner := scanner.NewPingScanner()
 
 	networkScanner.SetHostFoundHandler(func(host scanner.Host) {
-		fmt.Println(host)
+		fmt.Println("Discovered", host.String())
 	})
 
+	fmt.Println("Discovering hosts...")
 	if err := networkScanner.Scan(scanRange); err != nil {
 		log.Fatalf("Failed to start scanning: %s", err)
 	}
