@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/und3f/lanscan/discoverer"
+	"github.com/und3f/lanscan/discovery"
 	"github.com/und3f/lanscan/scanner"
 )
 
@@ -22,7 +22,7 @@ func main() {
 			log.Fatalf("Failed to parse scanning range: %s", err)
 		}
 	} else {
-		scanRange, err = discoverer.Interfaces()
+		scanRange, err = discovery.Interfaces()
 		if err != nil {
 			log.Fatalf("Failed to discover scanning range: %s", err)
 		}
