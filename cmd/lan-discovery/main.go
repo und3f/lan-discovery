@@ -16,6 +16,12 @@ func main() {
 	var scanRange scanner.Range
 	var err error
 
+	arp, err := discovery.NewARPDiscovery()
+	if err != nil {
+		log.Fatalf("ARP Discovery initialization failed: %s", err)
+	}
+	arp.Discover()
+
 	if len(os.Args) >= 2 {
 		scanRange, err = scanner.ParseCIDR(os.Args[1])
 		if err != nil {
