@@ -1,20 +1,21 @@
-package discovery
+package scanner
 
 import (
-	"fmt"
-
 	"github.com/prometheus/procfs"
 )
 
 type ARPDiscovery struct {
 	procfs procfs.FS
 	arp    []procfs.ARPEntry
+
+	ScannerEvents
 }
 
 const PROC_PATH = "/proc"
 
 func NewARPDiscovery() (ARPDiscovery, error) {
 	discovery := ARPDiscovery{}
+	discovery.InitEmpty()
 
 	if fs, err := procfs.NewFS(PROC_PATH); err != nil {
 		return discovery, err
@@ -29,12 +30,15 @@ func (discovery *ARPDiscovery) Discover() error {
 		discovery.arp = make([]procfs.ARPEntry, 0)
 		for _, entry := range arp {
 			if entry.IsComplete() {
-				discovery.arp = append(discovery.arp, entry)
+				host := NewHost(entry.IPAddr)
+				host.MAC = entry.HWAddr
+				discovery.hostFoundHandler(host)
 			}
 		}
 	} else {
 		return err
 	}
-	fmt.Println(discovery.arp)
+
+	discovery.scanEndedHandler()
 	return nil
 }

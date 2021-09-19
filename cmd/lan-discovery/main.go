@@ -12,15 +12,13 @@ import (
 const SCAN_TIMES = 3
 
 func main() {
-	hosts := make(map[string]scanner.Host)
 	var scanRange scanner.Range
 	var err error
 
-	arp, err := discovery.NewARPDiscovery()
+	arp, err := scanner.NewARPDiscovery()
 	if err != nil {
 		log.Fatalf("ARP Discovery initialization failed: %s", err)
 	}
-	arp.Discover()
 
 	if len(os.Args) >= 2 {
 		scanRange, err = scanner.ParseCIDR(os.Args[1])
@@ -34,20 +32,26 @@ func main() {
 		}
 	}
 
+	hs := scanner.NewHostsStorage()
+
 	networkScanner := scanner.NewPingScanner()
 
-	networkScanner.SetHostFoundHandler(func(host scanner.Host) {
-		if _, exists := hosts[host.IP.String()]; exists {
-			return
+	hostFoundHandler := func(host *scanner.Host) {
+		if updated := hs.Update(host); updated != nil {
+			fmt.Println("Discovered", host.String())
 		}
+	}
 
-		hosts[host.IP.String()] = host
-		fmt.Println("Discovered", host.String())
-	})
+	networkScanner.SetHostFoundHandler(hostFoundHandler)
+	arp.SetHostFoundHandler(hostFoundHandler)
 
 	fmt.Println("Discovering hosts...")
 	for i := 0; i < SCAN_TIMES; i++ {
 		if err := networkScanner.Scan(scanRange); err != nil {
+			log.Fatalf("Failed to start scanning: %s", err)
+		}
+
+		if err := arp.Discover(); err != nil {
 			log.Fatalf("Failed to start scanning: %s", err)
 		}
 	}

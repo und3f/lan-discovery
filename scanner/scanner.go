@@ -1,20 +1,6 @@
 package scanner
 
-import (
-	"fmt"
-	"net"
-)
-
-type Host struct {
-	IP       net.IP
-	Hostname string
-}
-
-func (h *Host) String() string {
-	return fmt.Sprintf("%s", h.IP.String())
-}
-
-type HostFoundHandler func(host Host)
+type HostFoundHandler func(host *Host)
 type ScanEndedHandler func()
 
 type Scanner interface {
@@ -37,6 +23,6 @@ func (se *ScannerEvents) SetScanEndedHandler(handler ScanEndedHandler) {
 }
 
 func (se *ScannerEvents) InitEmpty() {
-	se.hostFoundHandler = func(host Host) {}
+	se.hostFoundHandler = func(host *Host) {}
 	se.scanEndedHandler = func() {}
 }
