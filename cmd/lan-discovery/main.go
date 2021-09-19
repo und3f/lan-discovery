@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/und3f/lanscan/discovery"
-	"github.com/und3f/lanscan/scanner"
+	"github.com/und3f/lan-discovery/discovery"
+	"github.com/und3f/lan-discovery/scanner"
 )
 
 const SCAN_TIMES = 3

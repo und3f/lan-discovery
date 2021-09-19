@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/und3f/lanscan/scanner"
+	"github.com/und3f/lan-discovery/scanner"
 )
 
 func Interfaces() (scanner.Range, error) {

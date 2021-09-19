@@ -1,4 +1,4 @@
-module github.com/und3f/lanscan
+module github.com/und3f/lan-discovery
 
 go 1.17
 
