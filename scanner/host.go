@@ -5,14 +5,10 @@ import (
 	"net"
 )
 
-type HostUpdateSubscriber interface {
-	update(*Host)
-}
-
 type Host struct {
-	MAC      net.HardwareAddr
-	IP       net.IP
-	Hostname string
+	HardwareAddr net.HardwareAddr
+	IP           net.IP
+	Hostname     string
 }
 
 func NewHost(ip net.IP) *Host {
@@ -22,7 +18,7 @@ func NewHost(ip net.IP) *Host {
 }
 
 func (h *Host) String() string {
-	return fmt.Sprintf("%s (%s) %s", h.IP.String(), h.MAC, h.Hostname)
+	return fmt.Sprintf("%s (%s) %s", h.IP.String(), h.HardwareAddr, h.Hostname)
 }
 
 func (h *Host) Identifier() string {
@@ -32,9 +28,9 @@ func (h *Host) Identifier() string {
 func (h *Host) Update(host *Host) *Host {
 	var changed bool
 
-	if len(host.MAC) > 0 {
-		if len(h.MAC) == 0 || h.MAC.String() != host.MAC.String() {
-			h.MAC = host.MAC
+	if len(host.HardwareAddr) > 0 {
+		if len(h.HardwareAddr) == 0 || h.HardwareAddr.String() != host.HardwareAddr.String() {
+			h.HardwareAddr = host.HardwareAddr
 			changed = true
 		}
 	}
@@ -47,10 +43,13 @@ func (h *Host) Update(host *Host) *Host {
 	if changed {
 		return h
 	}
+
 	return nil
 }
 
 type HostsStorage struct {
+	HostUpdatePublisher HostUpdatePublisher
+
 	hosts map[string]*Host
 }
 
@@ -60,13 +59,19 @@ func NewHostsStorage() HostsStorage {
 	}
 }
 
-func (hs *HostsStorage) Update(h *Host) *Host {
+func (hs *HostsStorage) Update(h *Host) (retHost *Host) {
 	if storedHost, exists := hs.hosts[h.Identifier()]; exists {
-		return storedHost.Update(h)
+		retHost = storedHost.Update(h)
 	} else {
 		hs.hosts[h.Identifier()] = h
-		return h
+		retHost = h
 	}
+
+	if retHost != nil {
+		hs.HostUpdatePublisher.NotifySubscribers(retHost)
+	}
+
+	return
 }
 
 func (hs *HostsStorage) GetHosts() []*Host {
@@ -76,4 +81,31 @@ func (hs *HostsStorage) GetHosts() []*Host {
 	}
 
 	return hosts
+}
+
+type HostUpdateSubscriber interface {
+	Update(*Host) *Host
+}
+
+type HostUpdatePublisher struct {
+	subscribers []HostUpdateSubscriber
+}
+
+func (hp *HostUpdatePublisher) Subscribe(s HostUpdateSubscriber) {
+	hp.subscribers = append(hp.subscribers, s)
+}
+
+func (hp *HostUpdatePublisher) Unsubscribe(s HostUpdateSubscriber) {
+	for i, subscriber := range hp.subscribers {
+		if subscriber == s {
+			hp.subscribers = append(hp.subscribers[:i], hp.subscribers[i+1:]...)
+			break
+		}
+	}
+}
+
+func (hp *HostUpdatePublisher) NotifySubscribers(h *Host) {
+	for _, subscriber := range hp.subscribers {
+		subscriber.Update(h)
+	}
 }

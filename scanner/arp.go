@@ -31,7 +31,7 @@ func (discovery *ARPDiscovery) Discover() error {
 		for _, entry := range arp {
 			if entry.IsComplete() {
 				host := NewHost(entry.IPAddr)
-				host.MAC = entry.HWAddr
+				host.HardwareAddr = entry.HWAddr
 				discovery.hostFoundHandler(host)
 			}
 		}
