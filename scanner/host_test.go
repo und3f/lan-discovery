@@ -8,10 +8,11 @@ import (
 
 const SampleHostname = "Somehostname"
 
+const IP1Str, IP2Str = "127.0.0.1", "127.0.0.2"
+
 func TestHost(t *testing.T) {
-	ip1 := net.ParseIP("127.0.0.1")
-	// ip2 := net.ParseIP("127.0.0.2")
-	ip3 := net.ParseIP("127.0.0.1")
+	ip1 := net.ParseIP(IP1Str)
+	ip3 := net.ParseIP(IP1Str)
 
 	host := NewHost(ip1)
 
@@ -27,9 +28,12 @@ func TestHost(t *testing.T) {
 	}
 }
 
+func TestHostOnline(t *testing.T) {
+}
+
 func TestHostsStorage(t *testing.T) {
-	ip1 := net.ParseIP("127.0.0.1")
-	ip2 := net.ParseIP("127.0.0.2")
+	ip1 := net.ParseIP(IP1Str)
+	ip2 := net.ParseIP(IP2Str)
 
 	host1 := NewHost(ip1)
 	host2 := NewHost(ip1)
