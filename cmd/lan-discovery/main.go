@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"os"
+	"sort"
 
 	"github.com/und3f/lan-discovery/discovery"
 	"github.com/und3f/lan-discovery/scanner"
@@ -16,9 +18,6 @@ func main() {
 	hs := scanner.NewHostsStorage()
 
 	observer := &NewHostsObserver{}
-	hs.HostUpdatePublisher.Subscribe(observer)
-
-	fmt.Println("Discovering hosts...")
 
 	var arp scanner.ARPDiscovery
 	arp, err := scanner.NewARPDiscovery()
@@ -42,6 +41,9 @@ func main() {
 		}
 	}
 
+	fmt.Print("Discovering hosts...")
+	hs.HostUpdatePublisher.Subscribe(observer)
+
 	networkScanner := scanner.NewPingScanner()
 
 	hostFoundHandler := func(host *scanner.Host) { hs.Update(host) }
@@ -59,7 +61,11 @@ func main() {
 		}
 	}
 
+	hs.HostUpdatePublisher.Unsubscribe(observer)
+	fmt.Println()
+
 	PrintExternalHosts(&hs)
+	PrintNetwork(&hs)
 }
 
 func PrintExternalHosts(hs *scanner.HostsStorage) {
@@ -75,6 +81,32 @@ func PrintExternalHosts(hs *scanner.HostsStorage) {
 	}
 }
 
+func IsIPLess(a, b net.IP) bool {
+	if lenDiff := len(a) - len(b); lenDiff != 0 {
+		return lenDiff < 0
+	}
+	for i, part := range a {
+		if diff := part - b[i]; diff != 0 {
+			return diff < 0
+		}
+	}
+	return false
+}
+
+func PrintNetwork(hs *scanner.HostsStorage) {
+	var hosts []*scanner.Host
+	for _, host := range hs.GetHosts() {
+		if host.IsOnline() {
+			hosts = append(hosts, host)
+		}
+	}
+
+	sort.Slice(hosts, func(i, j int) bool { return IsIPLess(hosts[i].IP, hosts[j].IP) })
+	for _, host := range hosts {
+		fmt.Println(host.String())
+	}
+}
+
 type NewHostsObserver struct{}
 
 func (observer *NewHostsObserver) Update(host *scanner.Host) *scanner.Host {
@@ -82,6 +114,6 @@ func (observer *NewHostsObserver) Update(host *scanner.Host) *scanner.Host {
 		return nil
 	}
 
-	fmt.Println(host.String())
+	fmt.Print(".")
 	return nil
 }

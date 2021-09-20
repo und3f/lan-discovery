@@ -37,7 +37,7 @@ func (scanner *PingScanner) SetICMP(useICMP bool) {
 }
 
 func (scanner *PingScanner) AddHost(ip *net.IPAddr) {
-	scanner.hostFoundHandler(NewHost(cloneIP(ip.IP)))
+	scanner.hostFoundHandler(NewOnlineHost(cloneIP(ip.IP)))
 }
 
 func (scanner *PingScanner) Scan(network Range) error {

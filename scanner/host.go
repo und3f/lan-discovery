@@ -3,17 +3,26 @@ package scanner
 import (
 	"fmt"
 	"net"
+	"time"
 )
 
 type Host struct {
 	HardwareAddr net.HardwareAddr
 	IP           net.IP
 	Hostname     string
+	LastResponse time.Time
 }
 
 func NewHost(ip net.IP) *Host {
 	return &Host{
 		IP: ip,
+	}
+}
+
+func NewOnlineHost(ip net.IP) *Host {
+	return &Host{
+		IP:           ip,
+		LastResponse: time.Now(),
 	}
 }
 
@@ -40,11 +49,20 @@ func (h *Host) Update(host *Host) *Host {
 		changed = true
 	}
 
+	if h.LastResponse.Before(host.LastResponse) {
+		h.LastResponse = host.LastResponse
+		changed = true
+	}
+
 	if changed {
 		return h
 	}
 
 	return nil
+}
+
+func (h *Host) IsOnline() bool {
+	return !h.LastResponse.IsZero()
 }
 
 type HostsStorage struct {

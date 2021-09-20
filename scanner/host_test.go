@@ -29,6 +29,28 @@ func TestHost(t *testing.T) {
 }
 
 func TestHostOnline(t *testing.T) {
+	ip1 := net.ParseIP(IP1Str)
+	host := NewHost(ip1)
+
+	if want, got := false, host.IsOnline(); want != got {
+		t.Errorf("IsOnline(): wanted %t, got %t", want, got)
+	}
+
+	if want, got := host, host.Update(NewOnlineHost(ip1)); want != got {
+		t.Errorf("Update() with online status changed: wanted %s, got %s", want, got)
+	}
+
+	if want, got := true, host.IsOnline(); want != got {
+		t.Errorf("IsOnline(): wanted %t, got %t", want, got)
+	}
+
+	if got := host.Update(NewHost(ip1)); nil != got {
+		t.Error("Update() with unknown online status do not change original")
+	}
+
+	if want, got := true, host.IsOnline(); want != got {
+		t.Errorf("Update() with unknown online status do not change original: wanted %t, got %t", want, got)
+	}
 }
 
 func TestHostsStorage(t *testing.T) {
