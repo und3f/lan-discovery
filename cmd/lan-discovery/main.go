@@ -82,14 +82,18 @@ func PrintExternalHosts(hs *scanner.HostsStorage) {
 }
 
 func IsIPLess(a, b net.IP) bool {
+	a = a.To4()
+	b = b.To4()
 	if lenDiff := len(a) - len(b); lenDiff != 0 {
 		return lenDiff < 0
 	}
+
 	for i, part := range a {
 		if diff := part - b[i]; diff != 0 {
 			return diff < 0
 		}
 	}
+
 	return false
 }
 
