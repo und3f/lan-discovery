@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net"
@@ -88,13 +89,7 @@ func IsIPLess(a, b net.IP) bool {
 		return lenDiff < 0
 	}
 
-	for i, part := range a {
-		if diff := part - b[i]; diff != 0 {
-			return diff < 0
-		}
-	}
-
-	return false
+	return bytes.Compare(a, b) < 0
 }
 
 func PrintNetwork(hs *scanner.HostsStorage) {
